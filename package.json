@@ -4,8 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "babel src --out-dir dist",
+    "build": "npx babel src --out-dir dist",
     "dev": "concurrently \"npm run build -- --watch\" \"npm start\" \"nodemon --watch dist\"",
+    "gcp-build": "npm run build",
     "start": "npx functions-framework --target=syndicate --signature-type=http",
     "test": "npx vitest"
   },
