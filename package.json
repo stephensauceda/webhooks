@@ -8,7 +8,8 @@
     "dev": "concurrently \"npm run build -- --watch\" \"npm start\" \"nodemon --watch dist\"",
     "gcp-build": "npm run build",
     "start": "npx functions-framework --target=ghostSyndicate --signature-type=http",
-    "test": "npx vitest"
+    "test": "npx vitest",
+    "deploy": "gcloud functions deploy ghostSyndicate --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs20 --gen2"
   },
   "keywords": [],
   "author": "",
