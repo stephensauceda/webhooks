@@ -6,7 +6,7 @@ const SERVICE_MAP = {
 
 export function syndicate(post) {
   const {
-    current: { slug, tags },
+    current: { tags },
   } = post
 
   // get all services we need call

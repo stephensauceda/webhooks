@@ -1,6 +1,5 @@
 import syndicate from './syndicate'
 import { syndicateToMastodon } from './mastodon'
-import { expect } from 'vitest'
 
 vi.mock('./mastodon', () => ({
   syndicateToMastodon: vi.fn(),
