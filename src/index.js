@@ -1,8 +1,17 @@
 import { syndicate } from './lib/syndicate.js'
+import { validateWebhook } from './lib/validateWebhook.js'
 
 export const ghostSyndicate = async (req, res) => {
+  const authorizedWebhook = validateWebhook(req)
+
+  if (!authorizedWebhook) {
+    res.status(401).send('Unauthorized')
+    return
+  }
+
   if (req.method !== 'POST') {
-    return res.status(405).send('Method not allowed')
+    res.status(405).send('Method not allowed')
+    return
   }
 
   const { post } = req.body

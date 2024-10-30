@@ -21,6 +21,10 @@ export function syndicate(post) {
       return SERVICE_MAP[service](post)
     })
 
+  if (servicesToSyndicate.length === 0) {
+    return Promise.reject('No services to syndicate.')
+  }
+
   return Promise.allSettled(servicesToSyndicate)
     .then(results => {
       results.forEach(result => {

@@ -1,12 +1,39 @@
+import { vi, beforeEach, afterEach } from 'vitest'
 import { ghostSyndicate } from './index'
-import { syndicate as s } from './lib/syndicate'
+import { syndicate } from './lib/syndicate'
+import { validateWebhook } from './lib/validateWebhook'
+
+beforeEach(() => {
+  vi.mock('./lib/validateWebhook', () => ({
+    validateWebhook: vi.fn(),
+  }))
+
+  vi.mock('./lib/syndicate', () => ({
+    syndicate: vi.fn().mockResolvedValue(true),
+  }))
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
+test('does not allow unauthorized requests', async () => {
+  validateWebhook.mockReturnValue(false)
+  const req = { headers: {}, body: {} }
+  const res = { status: vi.fn(() => res), send: vi.fn() }
+
+  await ghostSyndicate(req, res)
+  expect(res.status).toHaveBeenCalledWith(401)
+  expect(res.send).toHaveBeenCalledWith('Unauthorized')
+})
 
 test.each(['GET', 'DELETE', 'PUT', 'PATCH'])(
   'does not allow %s requests',
   async method => {
+    validateWebhook.mockReturnValue(true)
     vi.spyOn(console, 'error')
 
-    const req = { method }
+    const req = { method, body: {} }
     const res = { status: vi.fn(() => res), send: vi.fn() }
 
     await ghostSyndicate(req, res)
@@ -16,38 +43,39 @@ test.each(['GET', 'DELETE', 'PUT', 'PATCH'])(
 )
 
 test('syndicates a post', async () => {
-  const req = { method: 'POST', body: { post: { title: 'foo' } } }
+  validateWebhook.mockReturnValue(true)
+  const req = {
+    method: 'POST',
+    body: { post: { title: 'foo' } },
+  }
   const res = {
     status: vi.fn(() => res),
     send: vi.fn(),
   }
 
-  vi.mock('./lib/syndicate', () => ({
-    syndicate: vi.fn().mockResolvedValue(true),
-  }))
-
   await ghostSyndicate(req, res)
-  expect(s).toHaveBeenCalledWith(req.body.post)
+  expect(syndicate).toHaveBeenCalledWith(req.body.post)
   expect(res.status).toHaveBeenCalledWith(200)
   expect(res.send).toHaveBeenCalledWith('OK')
 })
 
 test('catches errors for syndication', async () => {
-  const req = { method: 'POST', body: { post: { title: 'foo' } } }
+  validateWebhook.mockReturnValue(true)
+  syndicate.mockRejectedValue('rejected')
+  const req = {
+    method: 'POST',
+    body: { post: { title: 'foo' } },
+  }
   const res = {
     status: vi.fn(() => res),
     send: vi.fn(),
   }
 
-  const error = vi.spyOn(console, 'error')
-
-  vi.mock('./lib/syndicate', () => ({
-    syndicate: vi.fn().mockRejectedValue('rejected'),
-  }))
+  const error = vi.spyOn(console, 'error').mockReturnThis()
 
   await ghostSyndicate(req, res)
-  await expect(s).rejects.toEqual('rejected')
-  expect(s).toHaveBeenCalledWith(req.body.post)
+  await expect(syndicate).rejects.toEqual('rejected')
+  expect(syndicate).toHaveBeenCalledWith(req.body.post)
   expect(res.status).toHaveBeenCalledWith(200)
   expect(res.send).toHaveBeenCalledWith('OK')
   expect(error).toHaveBeenCalledWith('rejected')
