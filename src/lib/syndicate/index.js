@@ -1,4 +1,4 @@
-import { syndicateToMastodon } from './mastodon'
+import { syndicateToMastodon } from './mastodon.js'
 
 const SERVICE_MAP = {
   mastodon: syndicateToMastodon,

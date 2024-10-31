@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { validateWebhook } from './validateWebhook'
+import { validateWebhook } from './validateWebhook.js'
 import crypto from 'crypto'
 
 vi.mock('crypto', () => ({

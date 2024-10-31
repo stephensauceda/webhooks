@@ -1,4 +1,4 @@
-import { syndicate } from './lib/syndicate.js'
+import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
 
 export const ghostSyndicate = async (req, res) => {

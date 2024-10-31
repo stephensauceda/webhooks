@@ -1,7 +1,7 @@
 import { vi, beforeEach, afterEach } from 'vitest'
 import { ghostSyndicate } from './index'
-import { syndicate } from './lib/syndicate'
-import { validateWebhook } from './lib/validateWebhook'
+import { syndicate } from './lib/syndicate/index.js'
+import { validateWebhook } from './lib/validateWebhook.js'
 
 beforeEach(() => {
   vi.mock('./lib/validateWebhook', () => ({
