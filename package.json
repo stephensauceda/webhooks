@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm start\" \"nodemon --watch src\"",
-    "gcp-build": "npm run build",
     "start": "npx functions-framework --target=ghostSyndicate --signature-type=http",
     "test": "npx vitest",
     "deploy": "gcloud functions deploy ghostSyndicate --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs20 --gen2"

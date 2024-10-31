@@ -14,10 +14,15 @@ export const ghostSyndicate = async (req, res) => {
     return
   }
 
+  const { path } = req
   const { post } = req.body
 
   try {
-    await syndicate(post)
+    switch (path) {
+      case '/syndicate':
+        await syndicate(post)
+        break
+    }
   } catch (error) {
     console.error(error)
   }

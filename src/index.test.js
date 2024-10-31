@@ -1,4 +1,4 @@
-import { vi, beforeEach, afterEach } from 'vitest'
+import { vi, beforeEach, afterEach, expect } from 'vitest'
 import { ghostSyndicate } from './index'
 import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
@@ -42,11 +42,23 @@ test.each(['GET', 'DELETE', 'PUT', 'PATCH'])(
   }
 )
 
+test('returns 200 for unknown paths', async () => {
+  validateWebhook.mockReturnValue(true)
+  const req = { method: 'POST', body: {}, path: '/foo' }
+  const res = { status: vi.fn(() => res), send: vi.fn() }
+
+  await ghostSyndicate(req, res)
+  expect(res.status).toHaveBeenCalledWith(200)
+  expect(res.send).toHaveBeenCalledWith('OK')
+  expect(syndicate).not.toHaveBeenCalled()
+})
+
 test('syndicates a post', async () => {
   validateWebhook.mockReturnValue(true)
   const req = {
     method: 'POST',
     body: { post: { title: 'foo' } },
+    path: '/syndicate',
   }
   const res = {
     status: vi.fn(() => res),
@@ -65,6 +77,7 @@ test('catches errors for syndication', async () => {
   const req = {
     method: 'POST',
     body: { post: { title: 'foo' } },
+    path: '/syndicate',
   }
   const res = {
     status: vi.fn(() => res),
