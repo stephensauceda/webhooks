@@ -1,14 +1,14 @@
 {
-  "name": "ghost-syndicate-gcp",
+  "name": "webhooks",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm start\" \"nodemon --watch src\"",
-    "start": "npx functions-framework --target=ghostSyndicate --signature-type=http",
+    "start": "npx functions-framework --target=webhooks --signature-type=http",
     "test": "npx vitest",
-    "deploy": "gcloud functions deploy ghostSyndicate --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs20 --gen2"
+    "deploy": "gcloud functions deploy webhooks --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs20 --gen2"
   },
   "keywords": [],
   "author": "",
