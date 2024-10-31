@@ -8,7 +8,7 @@
     "dev": "concurrently \"npm start\" \"nodemon --watch src\"",
     "start": "npx functions-framework --target=webhooks --signature-type=http",
     "test": "npx vitest",
-    "deploy": "gcloud functions deploy webhooks --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs20 --gen2"
+    "deploy": "gcloud functions deploy webhooks --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs22 --gen2"
   },
   "keywords": [],
   "author": "",
