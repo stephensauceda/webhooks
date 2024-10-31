@@ -2,6 +2,7 @@ import { vi, beforeEach, afterEach, expect } from 'vitest'
 import { webhooks } from './index.js'
 import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
+import { send as sendWebmentions } from './lib/webmentions/index.js'
 
 beforeEach(() => {
   vi.mock('./lib/validateWebhook', () => ({
@@ -11,6 +12,10 @@ beforeEach(() => {
   vi.mock('./lib/syndicate', () => ({
     syndicate: vi.fn().mockResolvedValue(true),
   }))
+
+  vi.mock('./lib/webmentions', () => ({
+    send: vi.fn().mockResolvedValue(true),
+  }))
 })
 
 afterEach(() => {
@@ -19,7 +24,7 @@ afterEach(() => {
 
 test('does not allow unauthorized requests', async () => {
   validateWebhook.mockReturnValue(false)
-  const req = { headers: {}, body: {} }
+  const req = { headers: {}, body: {}, method: 'POST' }
   const res = { status: vi.fn(() => res), send: vi.fn() }
 
   await webhooks(req, res)
@@ -53,43 +58,88 @@ test('returns 200 for unknown paths', async () => {
   expect(syndicate).not.toHaveBeenCalled()
 })
 
-test('syndicates a post', async () => {
-  validateWebhook.mockReturnValue(true)
-  const req = {
-    method: 'POST',
-    body: { post: { title: 'foo' } },
-    path: '/syndicate',
-  }
-  const res = {
-    status: vi.fn(() => res),
-    send: vi.fn(),
-  }
+describe('/syndicate', () => {
+  test('syndicates a post', async () => {
+    validateWebhook.mockReturnValue(true)
+    const req = {
+      method: 'POST',
+      body: { post: { title: 'foo' } },
+      path: '/syndicate',
+    }
+    const res = {
+      status: vi.fn(() => res),
+      send: vi.fn(),
+    }
 
-  await webhooks(req, res)
-  expect(syndicate).toHaveBeenCalledWith(req.body.post)
-  expect(res.status).toHaveBeenCalledWith(200)
-  expect(res.send).toHaveBeenCalledWith('OK')
+    await webhooks(req, res)
+    expect(syndicate).toHaveBeenCalledWith(req.body.post)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.send).toHaveBeenCalledWith('OK')
+  })
+
+  test('catches errors for syndication', async () => {
+    validateWebhook.mockReturnValue(true)
+    syndicate.mockRejectedValue('rejected')
+    const req = {
+      method: 'POST',
+      body: { post: { title: 'foo' } },
+      path: '/syndicate',
+    }
+    const res = {
+      status: vi.fn(() => res),
+      send: vi.fn(),
+    }
+
+    const error = vi.spyOn(console, 'error').mockReturnThis()
+
+    await webhooks(req, res)
+    await expect(syndicate).rejects.toEqual('rejected')
+    expect(syndicate).toHaveBeenCalledWith(req.body.post)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.send).toHaveBeenCalledWith('OK')
+    expect(error).toHaveBeenCalledWith('rejected')
+  })
 })
 
-test('catches errors for syndication', async () => {
-  validateWebhook.mockReturnValue(true)
-  syndicate.mockRejectedValue('rejected')
-  const req = {
-    method: 'POST',
-    body: { post: { title: 'foo' } },
-    path: '/syndicate',
-  }
-  const res = {
-    status: vi.fn(() => res),
-    send: vi.fn(),
-  }
+describe('/send-webmentions', () => {
+  test('sends webmentions', async () => {
+    validateWebhook.mockReturnValue(true)
+    const req = {
+      method: 'POST',
+      body: { post: { title: 'foo' } },
+      path: '/send-webmentions',
+    }
+    const res = {
+      status: vi.fn(() => res),
+      send: vi.fn(),
+    }
 
-  const error = vi.spyOn(console, 'error').mockReturnThis()
+    await webhooks(req, res)
+    expect(sendWebmentions).toHaveBeenCalledWith(req.body.post)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.send).toHaveBeenCalledWith('OK')
+    expect(syndicate).not.toHaveBeenCalled()
+  })
 
-  await webhooks(req, res)
-  await expect(syndicate).rejects.toEqual('rejected')
-  expect(syndicate).toHaveBeenCalledWith(req.body.post)
-  expect(res.status).toHaveBeenCalledWith(200)
-  expect(res.send).toHaveBeenCalledWith('OK')
-  expect(error).toHaveBeenCalledWith('rejected')
+  test('catches errors for sending webhooks', async () => {
+    validateWebhook.mockReturnValue(true)
+    sendWebmentions.mockRejectedValue('rejected')
+    const req = {
+      method: 'POST',
+      body: { post: { title: 'foo' } },
+      path: '/send-webmentions',
+    }
+    const res = {
+      status: vi.fn(() => res),
+      send: vi.fn(),
+    }
+
+    const error = vi.spyOn(console, 'error').mockReturnThis()
+
+    await webhooks(req, res)
+    expect(sendWebmentions).toHaveBeenCalledWith(req.body.post)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.send).toHaveBeenCalledWith('OK')
+    expect(error).toHaveBeenCalledWith('rejected')
+  })
 })
