@@ -1,4 +1,4 @@
-import { MASTODON_API_URL, syndicateToMastodon } from './mastodon'
+import { MASTODON_API_URL, syndicateToMastodon } from './mastodon.js'
 
 const post = {
   current: {

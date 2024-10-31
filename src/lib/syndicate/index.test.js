@@ -1,7 +1,7 @@
-import syndicate from './syndicate'
-import { syndicateToMastodon } from './mastodon'
+import syndicate from './index.js'
+import { syndicateToMastodon } from './mastodon.js'
 
-vi.mock('./mastodon', () => ({
+vi.mock('./mastodon.js', () => ({
   syndicateToMastodon: vi.fn(),
 }))
 

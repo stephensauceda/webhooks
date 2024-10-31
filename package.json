@@ -1,15 +1,14 @@
 {
-  "name": "ghost-syndicate-gcp",
+  "name": "webhooks",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "build": "npx babel src --out-dir dist",
-    "dev": "concurrently \"npm run build -- --watch\" \"npm start\" \"nodemon --watch dist\"",
-    "gcp-build": "npm run build",
-    "start": "npx functions-framework --target=ghostSyndicate --signature-type=http",
+    "dev": "concurrently \"npm start\" \"nodemon --watch src\"",
+    "start": "npx functions-framework --target=webhooks --signature-type=http",
     "test": "npx vitest",
-    "deploy": "gcloud functions deploy ghostSyndicate --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs20 --gen2"
+    "deploy": "gcloud functions deploy webhooks --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs22 --gen2"
   },
   "keywords": [],
   "author": "",
@@ -19,9 +18,6 @@
     "core-js": "^3.37.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24.8",
-    "@babel/core": "^7.24.9",
-    "@babel/preset-env": "^7.25.0",
     "@eslint/js": "^9.8.0",
     "@vitest/coverage-v8": "^2.0.4",
     "concurrently": "^8.2.2",

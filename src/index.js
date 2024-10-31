@@ -1,7 +1,7 @@
-import { syndicate } from './lib/syndicate.js'
+import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
 
-export const ghostSyndicate = async (req, res) => {
+export const webhooks = async (req, res) => {
   const authorizedWebhook = validateWebhook(req)
 
   if (!authorizedWebhook) {
@@ -14,10 +14,15 @@ export const ghostSyndicate = async (req, res) => {
     return
   }
 
+  const { path } = req
   const { post } = req.body
 
   try {
-    await syndicate(post)
+    switch (path) {
+      case '/syndicate':
+        await syndicate(post)
+        break
+    }
   } catch (error) {
     console.error(error)
   }
