@@ -1,5 +1,5 @@
 import { vi, beforeEach, afterEach, expect } from 'vitest'
-import { webhooks } from './index'
+import { webhooks } from './index.js'
 import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
 

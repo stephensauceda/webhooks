@@ -1,15 +1,15 @@
-import syndicate from './index.js'
+import { syndicate } from './index.js'
 import { syndicateToMastodon } from './mastodon.js'
 
 vi.mock('./mastodon.js', () => ({
   syndicateToMastodon: vi.fn(),
 }))
 
-const error = vi.spyOn(console, 'error').mockImplementation(() => null)
-const log = vi.spyOn(console, 'log').mockImplementation(() => null)
+const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+const log = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
 afterEach(() => {
-  vi.restoreAllMocks()
+  vi.resetAllMocks()
 })
 
 test('logs when a service is not implemented', () => {
@@ -26,7 +26,7 @@ test('logs when a service is not implemented', () => {
   })
 })
 
-test.only('call the service function when the service is implemented', () => {
+test('call the service function when the service is implemented', async () => {
   expect.assertions(1)
 
   const post = {
@@ -36,19 +36,18 @@ test.only('call the service function when the service is implemented', () => {
     },
   }
 
-  syndicateToMastodon.mockResolvedValue(
+  syndicateToMastodon.mockResolvedValueOnce(
     `Syndicated ${post.current.slug} to mastodon.`
   )
 
-  return syndicate(post).then(() => {
-    expect(log).toHaveBeenCalledWith(
-      `Syndicated ${post.current.slug} to mastodon.`
-    )
-  })
+  await syndicate(post)
+  expect(log).toHaveBeenCalledWith(
+    `Syndicated ${post.current.slug} to mastodon.`
+  )
 })
 
-test('logs when the service call fails', () => {
-  syndicateToMastodon.mockRejectedValue(
+test('logs when the service call fails', async () => {
+  syndicateToMastodon.mockRejectedValueOnce(
     'Failed to syndicate to mastodon: something went wrong'
   )
   expect.assertions(1)
@@ -60,9 +59,8 @@ test('logs when the service call fails', () => {
     },
   }
 
-  return syndicate(post).then(() => {
-    expect(error).toHaveBeenCalledWith(
-      `Failed to syndicate to mastodon: something went wrong`
-    )
-  })
+  await syndicate(post)
+  expect(error).toHaveBeenCalledWith(
+    `Failed to syndicate to mastodon: something went wrong`
+  )
 })
