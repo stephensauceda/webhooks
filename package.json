@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm start\" \"nodemon --watch src\"",
+    "dev": "npx @dotenvx/dotenvx run -- concurrently \"npm start\" \"nodemon --watch src\"",
     "start": "npx functions-framework --target=webhooks --signature-type=http",
     "test": "npx vitest",
     "deploy": "gcloud functions deploy webhooks --region=\"us-east1\" --allow-unauthenticated --trigger-http --runtime=nodejs22 --gen2"
@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/functions-framework": "^3.4.2",
+    "cloudflare": "^3.5.0",
     "core-js": "^3.37.1"
   },
   "devDependencies": {

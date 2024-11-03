@@ -1,6 +1,7 @@
 import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
 import { send as sendWebmentions } from './lib/webmentions/index.js'
+import { purgeCache } from './lib/purge/index.js'
 
 export const webhooks = async (req, res) => {
   const authorizedWebhook = validateWebhook(req)
@@ -27,6 +28,9 @@ export const webhooks = async (req, res) => {
         break
       case '/send-webmentions':
         await sendWebmentions(payload)
+        break
+      case '/purge':
+        await purgeCache(payload)
         break
     }
   } catch (error) {

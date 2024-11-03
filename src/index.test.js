@@ -3,6 +3,7 @@ import { webhooks } from './index.js'
 import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
 import { send as sendWebmentions } from './lib/webmentions/index.js'
+import { purgeCache } from './lib/purge/index.js'
 
 beforeEach(() => {
   vi.mock('./lib/validateWebhook', () => ({
@@ -15,6 +16,10 @@ beforeEach(() => {
 
   vi.mock('./lib/webmentions', () => ({
     send: vi.fn().mockResolvedValue(true),
+  }))
+
+  vi.mock('./lib/purge', () => ({
+    purgeCache: vi.fn().mockResolvedValue(true),
   }))
 })
 
@@ -138,6 +143,48 @@ describe('/send-webmentions', () => {
 
     await webhooks(req, res)
     expect(sendWebmentions).toHaveBeenCalledWith(req.body.post)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.send).toHaveBeenCalledWith('OK')
+    expect(error).toHaveBeenCalledWith('rejected')
+  })
+})
+
+describe('/purge', () => {
+  test('purges the cache', async () => {
+    validateWebhook.mockReturnValue(true)
+    const req = {
+      method: 'POST',
+      body: { post: { title: 'foo' } },
+      path: '/purge',
+    }
+    const res = {
+      status: vi.fn(() => res),
+      send: vi.fn(),
+    }
+
+    await webhooks(req, res)
+    expect(syndicate).not.toHaveBeenCalled()
+    expect(sendWebmentions).not.toHaveBeenCalled()
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.send).toHaveBeenCalledWith('OK')
+    expect(purgeCache).toHaveBeenCalledWith(req.body.post)
+  })
+
+  test('catches errors for purging the cache', async () => {
+    validateWebhook.mockReturnValue(true)
+    purgeCache.mockRejectedValue('rejected')
+    const req = {
+      method: 'POST',
+      body: { post: { title: 'foo' } },
+      path: '/purge',
+    }
+    const res = {
+      status: vi.fn(() => res),
+      send: vi.fn(),
+    }
+    const error = vi.spyOn(console, 'error').mockReturnThis()
+    await webhooks(req, res)
+    expect(purgeCache).toHaveBeenCalledWith(req.body.post)
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.send).toHaveBeenCalledWith('OK')
     expect(error).toHaveBeenCalledWith('rejected')
