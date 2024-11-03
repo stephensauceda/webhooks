@@ -65,4 +65,19 @@ describe('syndicate', () => {
       `Failed to syndicate to mastodon: something went wrong`
     )
   })
+
+  test('rejects when no services are found', () => {
+    expect.assertions(1)
+
+    const post = {
+      current: {
+        slug: '/no-service',
+        tags: [],
+      },
+    }
+
+    return syndicate(post).catch(error => {
+      expect(error).toBe('No services to syndicate.')
+    })
+  })
 })
