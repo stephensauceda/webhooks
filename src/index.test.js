@@ -170,7 +170,7 @@ describe('/purge', () => {
     expect(purgeCache).toHaveBeenCalledWith(req.body.post)
   })
 
-  test.only('includes the query string in the payload', async () => {
+  test('includes the query string in the payload', async () => {
     validateWebhook.mockReturnValue(true)
     const req = {
       method: 'POST',
