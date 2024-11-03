@@ -15,13 +15,13 @@ describe('webmentions', () => {
       global.fetch = originalFetch
     })
 
-    it('should resolve with a message if no URL is provided', async () => {
+    test('should resolve with a message if no URL is provided', async () => {
       const post = { current: {} }
       const result = await send(post)
       expect(result).toBe('No URL to send webmentions to')
     })
 
-    it('should send webmentions and log the results', async () => {
+    test('should send webmentions and log the results', async () => {
       const post = { current: { url: 'https://example.com' } }
       const mockResponse = {
         ok: true,
@@ -43,7 +43,7 @@ describe('webmentions', () => {
       expect(log).toHaveBeenCalledWith('success: https://target.com')
     })
 
-    it('should reject with an error message if the fetch fails', async () => {
+    test('should reject with an error message if the fetch fails', async () => {
       const post = { current: { url: 'https://example.com' } }
       const mockResponse = { ok: false, status: 500 }
       global.fetch.mockResolvedValue(mockResponse)

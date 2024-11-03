@@ -16,19 +16,19 @@ beforeEach(() => {
 })
 
 describe('purgeCache', () => {
-  it('throws an error with no payload', async () => {
+  test('throws an error with no payload', async () => {
     await expect(purgeCache()).rejects.toThrow(
       'No payload provided to purgeCache.'
     )
   })
 
-  it('throws an error with no URL', async () => {
+  test('throws an error with no URL', async () => {
     await expect(purgeCache({})).rejects.toThrow(
       'No payload provided to purgeCache.'
     )
   })
 
-  it('purges a single URL', async () => {
+  test('purges a single URL', async () => {
     vi.stubEnv('CLOUDFLARE_ZONE_ID', '12345')
     const url = 'https://example.com'
 
@@ -40,7 +40,7 @@ describe('purgeCache', () => {
     })
   })
 
-  it('purges collections', async () => {
+  test('purges collections', async () => {
     vi.stubEnv('CLOUDFLARE_ZONE_ID', '12345')
     const url = 'https://example.com/my-post'
     const payload = {
@@ -77,7 +77,7 @@ describe('purgeCache', () => {
     })
   })
 
-  it('throws an error when purging fails', async () => {
+  test('throws an error when purging fails', async () => {
     vi.stubEnv('CLOUDFLARE_ZONE_ID', '12345')
     const url = 'https://example.com'
     const error = new Error('Purge failed')
@@ -88,7 +88,7 @@ describe('purgeCache', () => {
     )
   })
 
-  it('return the response from Cloudflare when purging is successful', async () => {
+  test('return the response from Cloudflare when purging is successful', async () => {
     vi.stubEnv('CLOUDFLARE_ZONE_ID', '12345')
     const url = 'https://example.com'
     const response = { success: true }

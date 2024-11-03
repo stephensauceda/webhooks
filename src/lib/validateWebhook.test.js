@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest'
 import { validateWebhook } from './validateWebhook.js'
 import crypto from 'crypto'
 
@@ -11,7 +10,7 @@ vi.mock('crypto', () => ({
 }))
 
 describe('validateWebhook', () => {
-  it('should return true for a valid webhook', () => {
+  test('should return true for a valid webhook', () => {
     const req = {
       headers: {
         'x-ghost-signature': 'sha256=validhash, t=1234567890',
@@ -29,7 +28,7 @@ describe('validateWebhook', () => {
     expect(result).toBe(true)
   })
 
-  it('should return false for an invalid webhook', () => {
+  test('should return false for an invalid webhook', () => {
     const req = {
       headers: {
         'x-ghost-signature': 'sha256=invalidhash, t=1234567890',
