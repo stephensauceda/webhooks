@@ -9,6 +9,12 @@ vi.mock('./cloudflare.js', () => ({
   },
 }))
 
+vi.spyOn(console, 'log').mockImplementation(() => null)
+
+beforeEach(() => {
+  vi.resetAllMocks()
+})
+
 describe('purgeCache', () => {
   it('throws an error with no payload', async () => {
     await expect(purgeCache()).rejects.toThrow(
@@ -31,6 +37,43 @@ describe('purgeCache', () => {
     expect(Cloudflare.cache.purge).toHaveBeenCalledWith({
       zone_id: '12345',
       files: [url],
+    })
+  })
+
+  it('purges collections', async () => {
+    vi.stubEnv('CLOUDFLARE_ZONE_ID', '12345')
+    const url = 'https://example.com/my-post'
+    const payload = {
+      current: {
+        url,
+        tags: [
+          {
+            visibility: 'public',
+            url: 'https://example.com/tag1',
+          },
+          {
+            visibility: 'internal',
+            url: '404',
+          },
+        ],
+      },
+      purgeCollections: 'true',
+    }
+
+    const collection = [
+      url,
+      'https://example.com/tag1',
+      'https://example.com/tag1/rss',
+      'https://example.com',
+      'https://example.com/rss',
+    ]
+
+    await purgeCache(payload)
+    console.log(collection)
+
+    expect(Cloudflare.cache.purge).toHaveBeenCalledWith({
+      zone_id: '12345',
+      files: expect.arrayContaining(collection),
     })
   })
 

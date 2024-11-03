@@ -13,7 +13,7 @@ vi.stubEnv('MASTODON_ACCESS_TOKEN', 'token')
 global.fetch = vi.fn()
 
 afterEach(() => {
-  vi.restoreAllMocks()
+  vi.resetAllMocks()
 })
 
 describe('Mastodon', () => {

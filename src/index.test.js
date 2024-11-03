@@ -24,7 +24,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  vi.restoreAllMocks()
+  vi.resetAllMocks()
 })
 
 test('does not allow unauthorized requests', async () => {
@@ -168,6 +168,24 @@ describe('/purge', () => {
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.send).toHaveBeenCalledWith('OK')
     expect(purgeCache).toHaveBeenCalledWith(req.body.post)
+  })
+
+  test('includes the query string in the payload', async () => {
+    validateWebhook.mockReturnValue(true)
+    const req = {
+      method: 'POST',
+      body: { post: { title: 'foo' } },
+      path: '/purge',
+      query: { purgeCollections: 'true' },
+    }
+    const res = {
+      status: vi.fn(() => res),
+      send: vi.fn(),
+    }
+
+    const payload = { ...req.body.post, ...req.query }
+    await webhooks(req, res)
+    expect(purgeCache).toHaveBeenCalledWith(payload)
   })
 
   test('catches errors for purging the cache', async () => {
