@@ -1,4 +1,4 @@
-import { send } from './index'
+import { send } from './index.js'
 
 describe('webmentions', () => {
   describe('send', () => {

@@ -1,4 +1,4 @@
-import { client as Cloudflare } from './cloudflare'
+import { client as Cloudflare } from './cloudflare.js'
 
 export async function purgeCache(payload) {
   const url = payload?.current?.url
