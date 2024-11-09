@@ -50,5 +50,18 @@ describe('webmentions', () => {
 
       await expect(send(post)).rejects.toBe('Failed to send webmentions: 500')
     })
+
+    test('should reject with an error message if the webmention.app API returns an error', async () => {
+      const post = { current: { url: 'https://example.com' } }
+      const mockResponse = {
+        ok: true,
+        json: async () => ({ error: 'test error' }),
+      }
+      global.fetch.mockResolvedValue(mockResponse)
+
+      await expect(send(post)).rejects.toBe(
+        'There was an error from the webmention.app API'
+      )
+    })
   })
 })

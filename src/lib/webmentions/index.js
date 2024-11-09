@@ -20,7 +20,11 @@ export function send(post) {
       return Promise.reject(`Failed to send webmentions: ${response.status}`)
     }
 
-    const { urls: sentMentions } = await response.json()
+    const res = await response.json()
+    if (res.error) {
+      return Promise.reject(`There was an error from the webmention.app API`)
+    }
+    const { urls: sentMentions } = res
     const message = `Sent ${sentMentions.length} webmentions for ${post.current.url}`
 
     console.log(message)
