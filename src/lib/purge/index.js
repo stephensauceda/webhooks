@@ -14,10 +14,10 @@ export async function purgeCache(payload) {
     const tagUrls = (
       payload.current.tags?.filter(t => t.visibility === 'public') || []
     )
-      .map(t => [t.url, `${t.url}/rss`])
+      .map(t => [t.url, `${t.url}rss/`]) // Ghost tag urls have a trailing slash already
       .flat()
 
-    files = [...files, ...tagUrls, baseUrl, `${baseUrl}/rss`]
+    files = [...files, ...tagUrls, baseUrl, `${baseUrl}/rss/`]
   }
 
   const zoneId = process.env.CLOUDFLARE_ZONE_ID

@@ -49,7 +49,7 @@ describe('purgeCache', () => {
         tags: [
           {
             visibility: 'public',
-            url: 'https://example.com/tag1',
+            url: 'https://example.com/tag1/',
           },
           {
             visibility: 'internal',
@@ -62,14 +62,13 @@ describe('purgeCache', () => {
 
     const collection = [
       url,
-      'https://example.com/tag1',
-      'https://example.com/tag1/rss',
+      'https://example.com/tag1/',
+      'https://example.com/tag1/rss/',
       'https://example.com',
-      'https://example.com/rss',
+      'https://example.com/rss/',
     ]
 
     await purgeCache(payload)
-    console.log(collection)
 
     expect(Cloudflare.cache.purge).toHaveBeenCalledWith({
       zone_id: '12345',
