@@ -12,7 +12,7 @@ const post = {
 vi.stubEnv('MASTODON_ACCESS_TOKEN', 'token')
 global.fetch = vi.fn()
 
-afterEach(() => {
+beforeEach(() => {
   vi.resetAllMocks()
 })
 
@@ -33,7 +33,7 @@ describe('Mastodon', () => {
     })
   })
 
-  test('solves with syndication message when successful', async () => {
+  test('resolves with syndication message when successful', async () => {
     expect.assertions(1)
     fetch.mockResolvedValue({ ok: true })
     await expect(syndicateToMastodon(post)).resolves.toBe(
