@@ -1,3 +1,4 @@
+/* v8 ignore start */
 import { AtpAgent } from '@atproto/api'
 
 async function main() {
@@ -14,3 +15,4 @@ async function main() {
 }
 
 export const agent = main()
+/* v8 ignore end */
