@@ -1,14 +1,19 @@
 import { syndicate } from './index.js'
 import { syndicateToMastodon } from './mastodon.js'
+import { syndicateToBluesky } from './bluesky/index.js'
 
 vi.mock('./mastodon.js', () => ({
-  syndicateToMastodon: vi.fn(),
+  syndicateToMastodon: vi.fn().mockResolvedValue(true),
+}))
+
+vi.mock('./bluesky/index.js', () => ({
+  syndicateToBluesky: vi.fn().mockResolvedValue(true),
 }))
 
 const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 const log = vi.spyOn(console, 'log').mockImplementation(() => undefined)
 
-afterEach(() => {
+beforeEach(() => {
   vi.resetAllMocks()
 })
 
@@ -78,6 +83,51 @@ describe('syndicate', () => {
 
     return syndicate(post).catch(error => {
       expect(error).toBe('No services to syndicate.')
+    })
+  })
+
+  describe('Bluesky', () => {
+    test('syndicates to Bluesky', async () => {
+      const post = {
+        current: {
+          url: 'https://example.com',
+          custom_excerpt: 'Custom Excerpt',
+          title: 'Post Title',
+          slug: 'post-slug',
+          tags: [{ name: '#syndicate:bluesky' }],
+        },
+      }
+
+      syndicateToBluesky.mockResolvedValueOnce(
+        `Syndicated ${post.current.slug} to Bluesky.`
+      )
+
+      await syndicate(post)
+      expect(log).toHaveBeenCalledWith(
+        `Syndicated ${post.current.slug} to Bluesky.`
+      )
+    })
+
+    test('logs when the service call fails', async () => {
+      syndicateToBluesky.mockRejectedValueOnce(
+        'Failed to syndicate to Bluesky: something went wrong'
+      )
+      expect.assertions(1)
+
+      const post = {
+        current: {
+          url: 'https://example.com',
+          custom_excerpt: 'Custom Excerpt',
+          title: 'Post Title',
+          slug: 'post-slug',
+          tags: [{ name: '#syndicate:bluesky' }],
+        },
+      }
+
+      await syndicate(post)
+      expect(error).toHaveBeenCalledWith(
+        `Failed to syndicate to Bluesky: something went wrong`
+      )
     })
   })
 })

@@ -1,7 +1,9 @@
 import { syndicateToMastodon } from './mastodon.js'
+import { syndicateToBluesky } from './bluesky/index.js'
 
 const SERVICE_MAP = {
   mastodon: syndicateToMastodon,
+  bluesky: syndicateToBluesky,
 }
 
 export function syndicate(post) {
