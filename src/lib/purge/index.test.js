@@ -1,12 +1,12 @@
-import { client as Cloudflare } from './cloudflare.js'
+import { CloudflareClient } from '../../services/cloudflare.js'
 import { purgeCache } from './index.js'
 
-vi.mock('./cloudflare.js', () => ({
-  client: {
+vi.mock('../../services/cloudflare.js', () => ({
+  CloudflareClient: {
     cache: {
-      purge: vi.fn(),
-    },
-  },
+      purge: vi.fn()
+    }
+  }
 }))
 
 vi.spyOn(console, 'log').mockImplementation(() => null)
@@ -34,9 +34,9 @@ describe('purgeCache', () => {
 
     await purgeCache({ current: { url } })
 
-    expect(Cloudflare.cache.purge).toHaveBeenCalledWith({
+    expect(CloudflareClient.cache.purge).toHaveBeenCalledWith({
       zone_id: '12345',
-      files: [url],
+      files: [url]
     })
   })
 
@@ -49,15 +49,15 @@ describe('purgeCache', () => {
         tags: [
           {
             visibility: 'public',
-            url: 'https://example.com/tag1/',
+            url: 'https://example.com/tag1/'
           },
           {
             visibility: 'internal',
-            url: '404',
-          },
-        ],
+            url: '404'
+          }
+        ]
       },
-      purgeCollections: 'true',
+      purgeCollections: 'true'
     }
 
     const collection = [
@@ -65,14 +65,14 @@ describe('purgeCache', () => {
       'https://example.com/tag1/',
       'https://example.com/tag1/rss/',
       'https://example.com',
-      'https://example.com/rss/',
+      'https://example.com/rss/'
     ]
 
     await purgeCache(payload)
 
-    expect(Cloudflare.cache.purge).toHaveBeenCalledWith({
+    expect(CloudflareClient.cache.purge).toHaveBeenCalledWith({
       zone_id: '12345',
-      files: expect.arrayContaining(collection),
+      files: expect.arrayContaining(collection)
     })
   })
 
@@ -80,7 +80,7 @@ describe('purgeCache', () => {
     vi.stubEnv('CLOUDFLARE_ZONE_ID', '12345')
     const url = 'https://example.com'
     const error = new Error('Purge failed')
-    Cloudflare.cache.purge.mockRejectedValue(error)
+    CloudflareClient.cache.purge.mockRejectedValue(error)
 
     await expect(purgeCache({ current: { url } })).rejects.toThrow(
       'Purge failed'
@@ -91,7 +91,7 @@ describe('purgeCache', () => {
     vi.stubEnv('CLOUDFLARE_ZONE_ID', '12345')
     const url = 'https://example.com'
     const response = { success: true }
-    Cloudflare.cache.purge.mockResolvedValue(response)
+    CloudflareClient.cache.purge.mockResolvedValue(response)
 
     await expect(purgeCache({ current: { url } })).resolves.toEqual(response)
   })

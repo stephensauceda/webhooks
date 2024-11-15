@@ -1,4 +1,4 @@
-import { client as Cloudflare } from './cloudflare.js'
+import { CloudflareClient } from '../../services/cloudflare.js'
 
 export async function purgeCache(payload) {
   const url = payload?.current?.url
@@ -24,9 +24,9 @@ export async function purgeCache(payload) {
 
   console.log('Purging cache for:', files.join(', '))
   try {
-    const response = await Cloudflare.cache.purge({
+    const response = await CloudflareClient.cache.purge({
       zone_id: zoneId,
-      files,
+      files
     })
     console.log(response)
     return response
