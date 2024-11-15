@@ -1,3 +1,4 @@
+/* v8 ignore start */
 import { AtpAgent as Agent, RichText } from '@atproto/api'
 
 const AtpAgent = new Agent({
@@ -10,3 +11,4 @@ await AtpAgent.login({
 })
 
 export default { AtpAgent, RichText }
+/* v8 ignore end */
