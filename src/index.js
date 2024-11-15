@@ -1,5 +1,5 @@
 import { syndicate } from './lib/syndicate/index.js'
-import { validateWebhook } from './lib/validateWebhook.js'
+import { validateWebhook } from './lib/validateWebhook/index.js'
 import { sendWebmentions } from './lib/webmentions/index.js'
 import { purge } from './lib/purge/index.js'
 

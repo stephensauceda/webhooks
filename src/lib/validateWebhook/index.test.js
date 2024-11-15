@@ -1,21 +1,21 @@
-import { validateWebhook } from './validateWebhook.js'
+import { validateWebhook } from './index.js'
 import crypto from 'crypto'
 
 vi.mock('crypto', () => ({
   default: {
     createHmac: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
-    digest: vi.fn().mockReturnValue('validhash'),
-  },
+    digest: vi.fn().mockReturnValue('validhash')
+  }
 }))
 
 describe('validateWebhook', () => {
   test('should return true for a valid webhook', () => {
     const req = {
       headers: {
-        'x-ghost-signature': 'sha256=validhash, t=1234567890',
+        'x-ghost-signature': 'sha256=validhash, t=1234567890'
       },
-      body: { key: 'value' },
+      body: { key: 'value' }
     }
     process.env.GHOST_WEBHOOK_SECRET = 'secret'
     const validHash = crypto
@@ -31,9 +31,9 @@ describe('validateWebhook', () => {
   test('should return false for an invalid webhook', () => {
     const req = {
       headers: {
-        'x-ghost-signature': 'sha256=invalidhash, t=1234567890',
+        'x-ghost-signature': 'sha256=invalidhash, t=1234567890'
       },
-      body: { key: 'value' },
+      body: { key: 'value' }
     }
     process.env.GHOST_WEBHOOK_SECRET = 'secret'
 
