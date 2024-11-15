@@ -5,50 +5,54 @@ const post = {
     url: 'https://example.com/foo',
     custom_excerpt: 'excerpt',
     title: 'title',
-    slug: '/foo',
-  },
+    slug: '/foo'
+  }
 }
 
-vi.stubEnv('MASTODON_ACCESS_TOKEN', 'token')
 global.fetch = vi.fn()
-
-beforeEach(() => {
-  vi.resetAllMocks()
-})
+vi.spyOn(console, 'log').mockResolvedValue()
+vi.stubEnv('MASTODON_ACCESS_TOKEN', 'token')
 
 describe('Mastodon', () => {
+  beforeEach(() => {
+    global.fetch.mockReset()
+  })
+
   test('makes a POST request to the MASTODON API', async () => {
-    expect.assertions(1)
     fetch.mockResolvedValue({ ok: true })
     await syndicateToMastodon(post)
     expect(fetch).toHaveBeenCalledWith(MASTODON_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer token`,
+        Authorization: `Bearer token`
       },
       body: JSON.stringify({
-        status: `${post.current.custom_excerpt} ${post.current.url}`,
-      }),
+        status: `${post.current.custom_excerpt} ${post.current.url}`
+      })
     })
+
+    expect(console.log).toHaveBeenCalledWith(
+      `Syndicated to Mastodon: ${post.current.slug}`
+    )
   })
 
   test('resolves with syndication message when successful', async () => {
-    expect.assertions(1)
     fetch.mockResolvedValue({ ok: true })
-    await expect(syndicateToMastodon(post)).resolves.toBe(
-      `Syndicated ${post.current.slug} to Mastodon.`
+    await syndicateToMastodon(post)
+
+    expect(console.log).toHaveBeenCalledWith(
+      `Syndicated to Mastodon: ${post.current.slug}`
     )
   })
 
   test('rejects to failed syndication message when unsuccessful', async () => {
-    expect.assertions(1)
     fetch.mockResolvedValue({
       ok: false,
-      json: () => Promise.resolve({ error: 'something went wrong' }),
+      json: vi.fn().mockResolvedValue({ error: 'something went wrong' })
     })
 
-    await expect(syndicateToMastodon(post)).rejects.toBe(
+    await expect(syndicateToMastodon(post)).rejects.toThrow(
       `Failed to syndicate to Mastodon: something went wrong`
     )
   })
