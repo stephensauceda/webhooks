@@ -1,7 +1,7 @@
 import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
 import { send as sendWebmentions } from './lib/webmentions/index.js'
-import { purgeCache } from './lib/purge/index.js'
+import { purge } from './lib/purge/index.js'
 
 export const webhooks = async (req, res) => {
   if (req.method !== 'POST') {
@@ -30,7 +30,7 @@ export const webhooks = async (req, res) => {
         await sendWebmentions(payload)
         break
       case '/purge':
-        await purgeCache({ ...payload, ...query })
+        await purge({ ...payload, ...query })
         break
     }
   } catch (error) {

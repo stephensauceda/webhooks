@@ -1,6 +1,6 @@
 import { CloudflareClient } from '../../services/cloudflare.js'
 
-export async function purgeCache(payload) {
+export async function purge(payload) {
   const url = payload?.current?.url
 
   if (!url) {

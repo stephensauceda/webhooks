@@ -2,23 +2,23 @@ import { webhooks } from './index.js'
 import { syndicate } from './lib/syndicate/index.js'
 import { validateWebhook } from './lib/validateWebhook.js'
 import { send as sendWebmentions } from './lib/webmentions/index.js'
-import { purgeCache } from './lib/purge/index.js'
+import { purge } from './lib/purge/index.js'
 
 beforeEach(() => {
   vi.mock('./lib/validateWebhook', () => ({
-    validateWebhook: vi.fn(),
+    validateWebhook: vi.fn()
   }))
 
   vi.mock('./lib/syndicate', () => ({
-    syndicate: vi.fn().mockResolvedValue(true),
+    syndicate: vi.fn().mockResolvedValue(true)
   }))
 
   vi.mock('./lib/webmentions', () => ({
-    send: vi.fn().mockResolvedValue(true),
+    send: vi.fn().mockResolvedValue(true)
   }))
 
   vi.mock('./lib/purge', () => ({
-    purgeCache: vi.fn().mockResolvedValue(true),
+    purge: vi.fn().mockResolvedValue(true)
   }))
 })
 
@@ -68,11 +68,11 @@ describe('/syndicate', () => {
     const req = {
       method: 'POST',
       body: { post: { title: 'foo' } },
-      path: '/syndicate',
+      path: '/syndicate'
     }
     const res = {
       status: vi.fn(() => res),
-      send: vi.fn(),
+      send: vi.fn()
     }
 
     await webhooks(req, res)
@@ -87,11 +87,11 @@ describe('/syndicate', () => {
     const req = {
       method: 'POST',
       body: { post: { title: 'foo' } },
-      path: '/syndicate',
+      path: '/syndicate'
     }
     const res = {
       status: vi.fn(() => res),
-      send: vi.fn(),
+      send: vi.fn()
     }
 
     const error = vi.spyOn(console, 'error').mockReturnThis()
@@ -111,11 +111,11 @@ describe('/send-webmentions', () => {
     const req = {
       method: 'POST',
       body: { post: { title: 'foo' } },
-      path: '/send-webmentions',
+      path: '/send-webmentions'
     }
     const res = {
       status: vi.fn(() => res),
-      send: vi.fn(),
+      send: vi.fn()
     }
 
     await webhooks(req, res)
@@ -131,11 +131,11 @@ describe('/send-webmentions', () => {
     const req = {
       method: 'POST',
       body: { post: { title: 'foo' } },
-      path: '/send-webmentions',
+      path: '/send-webmentions'
     }
     const res = {
       status: vi.fn(() => res),
-      send: vi.fn(),
+      send: vi.fn()
     }
 
     const error = vi.spyOn(console, 'error').mockReturnThis()
@@ -154,11 +154,11 @@ describe('/purge', () => {
     const req = {
       method: 'POST',
       body: { post: { title: 'foo' } },
-      path: '/purge',
+      path: '/purge'
     }
     const res = {
       status: vi.fn(() => res),
-      send: vi.fn(),
+      send: vi.fn()
     }
 
     await webhooks(req, res)
@@ -166,7 +166,7 @@ describe('/purge', () => {
     expect(sendWebmentions).not.toHaveBeenCalled()
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.send).toHaveBeenCalledWith('OK')
-    expect(purgeCache).toHaveBeenCalledWith(req.body.post)
+    expect(purge).toHaveBeenCalledWith(req.body.post)
   })
 
   test('includes the query string in the payload', async () => {
@@ -175,33 +175,33 @@ describe('/purge', () => {
       method: 'POST',
       body: { post: { title: 'foo' } },
       path: '/purge',
-      query: { purgeCollections: 'true' },
+      query: { purgeCollections: 'true' }
     }
     const res = {
       status: vi.fn(() => res),
-      send: vi.fn(),
+      send: vi.fn()
     }
 
     const payload = { ...req.body.post, ...req.query }
     await webhooks(req, res)
-    expect(purgeCache).toHaveBeenCalledWith(payload)
+    expect(purge).toHaveBeenCalledWith(payload)
   })
 
   test('catches errors for purging the cache', async () => {
     validateWebhook.mockReturnValue(true)
-    purgeCache.mockRejectedValue('rejected')
+    purge.mockRejectedValue('rejected')
     const req = {
       method: 'POST',
       body: { post: { title: 'foo' } },
-      path: '/purge',
+      path: '/purge'
     }
     const res = {
       status: vi.fn(() => res),
-      send: vi.fn(),
+      send: vi.fn()
     }
     const error = vi.spyOn(console, 'error').mockReturnThis()
     await webhooks(req, res)
-    expect(purgeCache).toHaveBeenCalledWith(req.body.post)
+    expect(purge).toHaveBeenCalledWith(req.body.post)
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.send).toHaveBeenCalledWith('OK')
     expect(error).toHaveBeenCalledWith('rejected')
