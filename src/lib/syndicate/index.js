@@ -29,15 +29,17 @@ export async function syndicate(post) {
   }
 
   try {
-    const response = Promise.allSettled(servicesToSyndicate).then(results => {
-      results.forEach(result => {
-        if (result.status === 'rejected') {
-          console.error(result.reason)
-        } else {
-          console.log(result.value)
-        }
-      })
-    })
+    const response = await Promise.allSettled(servicesToSyndicate).then(
+      results => {
+        results.forEach(result => {
+          if (result.status === 'rejected') {
+            console.error(result.reason)
+          } else {
+            console.log(result.value)
+          }
+        })
+      }
+    )
 
     return response
   } catch (error) {
