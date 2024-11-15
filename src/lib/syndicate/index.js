@@ -1,14 +1,14 @@
 import { syndicateToMastodon } from './mastodon.js'
-import { syndicateToBluesky } from './bluesky/index.js'
+import { syndicateToBluesky } from './bluesky.js'
 
 const SERVICE_MAP = {
   mastodon: syndicateToMastodon,
-  bluesky: syndicateToBluesky,
+  bluesky: syndicateToBluesky
 }
 
-export function syndicate(post) {
+export async function syndicate(post) {
   const {
-    current: { tags },
+    current: { tags }
   } = post
 
   // get all services we need call
@@ -17,18 +17,19 @@ export function syndicate(post) {
     .map(t => t.name.split(':')[1])
     .map(service => {
       if (!SERVICE_MAP[service]) {
-        return Promise.reject(`Service ${service} not implemented.`)
+        throw new Error(`Service ${service} not implemented.`)
       }
 
       return SERVICE_MAP[service](post)
     })
 
   if (servicesToSyndicate.length === 0) {
-    return Promise.reject('No services to syndicate.')
+    console.log('No services to syndicate. Ignoring.')
+    return
   }
 
-  return Promise.allSettled(servicesToSyndicate)
-    .then(results => {
+  try {
+    const response = Promise.allSettled(servicesToSyndicate).then(results => {
       results.forEach(result => {
         if (result.status === 'rejected') {
           console.error(result.reason)
@@ -37,9 +38,9 @@ export function syndicate(post) {
         }
       })
     })
-    .catch(error => {
-      console.error(error.message)
-    })
-}
 
-export default syndicate
+    return response
+  } catch (error) {
+    throw new Error(error.message, { cause: error })
+  }
+}
