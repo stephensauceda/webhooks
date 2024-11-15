@@ -1,14 +1,19 @@
 /* v8 ignore start */
-import { AtpAgent as Agent, RichText } from '@atproto/api'
+import { AtpAgent as Agent, RichText as RT } from '@atproto/api'
 
-const AtpAgent = new Agent({
-  service: 'https://bsky.social'
-})
+async function init() {
+  const AtpAgent = new Agent({
+    service: 'https://bsky.social'
+  })
 
-await AtpAgent.login({
-  identifier: 'stephensauceda.com',
-  password: process.env.BLUESKY_APP_PASSWORD
-})
+  await AtpAgent.login({
+    identifier: 'stephensauceda.com',
+    password: process.env.BLUESKY_APP_PASSWORD
+  })
 
-export default { AtpAgent, RichText }
+  return AtpAgent
+}
+
+export const AtpAgent = init()
+export const RichText = RT
 /* v8 ignore end */
